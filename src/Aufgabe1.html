@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="pretty.css">
+		<title>Zettel 5 - Aufgabe 1</title>
+
+		<script id="vertex-shader" type="x-shader/x-vertex">
+			attribute vec4 vPosition;
+
+			uniform mat4 modelMatrix;
+			uniform mat4 projectionMatrix;
+			uniform mat4 viewMatrix;
+
+			void main()
+			{
+				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vPosition;
+			}
+		</script>
+		<script id="fragment-shader" type="x-shader/x-fragment">
+			precision mediump float;
+
+			uniform vec4 objectColor;
+
+			void main()
+			{
+				gl_FragColor = objectColor;
+			}
+		</script>
+
+		<script id="vertex-shader-lighting" type="x-shader/x-vertex">
+			attribute vec4 vPosition;
+			attribute vec4 vNormal;
+
+			// ambient intensity
+			uniform vec4 Ia;
+
+			// position of the light in world coordinates
+			uniform vec3 lightPosition;
+
+			// diffuse and specular intensities of the light source
+			uniform vec4 Id;
+			uniform vec4 Is;
+
+			// ambient, diffuse and specular reflection factors (object specific)
+			uniform vec4 ka;
+			uniform vec4 kd;
+			uniform vec4 ks;
+
+			// pre-computed normal matrix
+			uniform mat4 normalMatrix;
+
+			// transformation matrices
+			uniform mat4 modelMatrix;
+			uniform mat4 projectionMatrix;
+			uniform mat4 viewMatrix;
+
+			// constant, linear and quadratic attenuation factors
+			const float c1 = 1.0;
+			const float c2 = 0.0005;
+			const float c3 = 0.000003;
+
+			// specular exponent
+			const float n = 5.0;
+
+			// calculated color using the Phong illumination model
+			varying vec4 color;
+
+			void main()
+			{
+				mat4 modelViewMatrix = viewMatrix * modelMatrix;
+				vec4 position = modelViewMatrix * vPosition;
+				gl_Position = projectionMatrix * position;
+
+				// light direction
+				vec3 L = normalize((viewMatrix * vec4(lightPosition, 1) - position).xyz);
+				// normal
+				vec3 N = normalize((normalMatrix * vNormal).xyz);
+
+				// view direction
+				vec3 V = normalize((-position).xyz);
+				// reflection direction
+				vec3 R = reflect(-L, N);
+
+				// distance between light source and vertex
+				float distance = length(viewMatrix * vec4(lightPosition, 1) - position);
+				// distance attenuation
+				float fAtt = min(1.0 / (c1 + c2 * distance + c3 * pow(distance, 2.0)), 1.0);
+
+				color = Ia * ka + fAtt * (Id * kd * max(dot(N, L), 0.0) + Is * ks * pow(max(0.0, dot(R, V)), n));
+			}
+		</script>
+
+		<script id="fragment-shader-lighting" type="x-shader/x-fragment">
+			precision mediump float;
+
+			varying vec4 color;
+
+			void main()
+			{
+				gl_FragColor = color;
+			}
+		</script>
+
+		<script type="text/javascript" src="../Common/webgl-utils.js">
+		</script>
+		<script type="text/javascript" src="../Common/initShaders.js">
+		</script>
+		<script type="text/javascript" src="../Common/gl-matrix.js">
+		</script>
+		<script type="text/javascript" src="arrays.js">
+		</script>
+		<script type="text/javascript" src="island1.js">
+		</script>
+	</head>
+	<body>
+
+		<canvas id="gl-canvas" width="640" height="360">
+			If you see this, your browser doesn't support WebGL.
+		</canvas>
+
+	</body>
+</html>

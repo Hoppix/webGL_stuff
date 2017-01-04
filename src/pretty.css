@@ -1,0 +1,36 @@
+#container
+{
+  position: relative;
+}
+
+#container canvas, #overlay
+{
+  position: absolute;
+  left: 0px;
+  top: 3px;
+}
+
+canvas
+{
+  border: 4px solid black;
+  border-radius: 6px;
+}
+
+body
+{
+  text-align: center;
+  background: #333333;
+}
+
+#page-wrap
+{
+     width: 800px;
+     margin: 0 auto;
+}
+
+h2
+{
+  border: 4px solid black;
+  border-radius: 6px;
+  text-align: center;
+}
