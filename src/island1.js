@@ -12,21 +12,16 @@ var target;
 var up;
 
 var keys = [];
-var moveSpeed = 0.2;
+var moveSpeed = 0.01;
 
 var objects = [];
 
-//setup viewMatrix (camera)
-eye = vec3.fromValues(-3.0, 1.0, -3.0);
-up = vec3.fromValues(0.0, 1.0, 0.0);
-lookVector= vec3.fromValues(1.0,0.0,1.0);
-target = vec3.create();
-//TODO was is das?
-vec3.add(target, eye, lookVector);
 
-viewMatrix = mat4.create();
-mat4.lookAt(viewMatrix, eye, target, up);
-
+	//setup viewMatrix (camera)
+	eye = vec3.fromValues(3.0, 1.0, 3.0);
+	up = vec3.fromValues(0.0, 1.0, 0.0);
+	target = vec3.fromValues(1.0, 1.0, 1.0);
+	
 var RenderObject = function(transform, color, shader, buffer, bufferLength)
 {
 	this.transform = transform;
@@ -65,6 +60,7 @@ window.onload = function init()
 	document.addEventListener('pointerlockchange', setupMouseLock, false);
 	document.addEventListener('mozpointerlockchange', setupMouseLock, false);
 
+	
 
 	// Configure viewport
 	gl.viewport(0,0,canvas.width,canvas.height);
@@ -159,10 +155,10 @@ window.onload = function init()
 function render()
 {
 
-	//Keyinputs per frame
-	moveEventHandling();
-
-
+	//Kamerakoordinaten per frame
+	viewMatrix = mat4.create();
+	mat4.lookAt(viewMatrix, eye, target, up);
+	
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	objects.forEach(function(object)
@@ -219,6 +215,13 @@ function render()
 
 		// Set textures TODO
 
+		//Keyinputs per frame
+		moveEventHandling();
+	
+		//Kamerakoordinaten per frame
+		viewMatrix = mat4.create();
+		mat4.lookAt(viewMatrix, eye, target, up);
+		
 		// Set uniforms
 		var projectionMatrixLoc = gl.getUniformLocation(object.shader, "projectionMatrix");
 		var viewMatrixLoc = gl.getUniformLocation(object.shader, "viewMatrix");
@@ -257,6 +260,7 @@ function moveForward()
 {
 	if (keys[87])
 	{
+		
 		const backupEye = eye[1];
 		const backupTarget = target[1];
 		var distance = vec3.create();
