@@ -21,7 +21,7 @@ var objects = [];
 	eye = vec3.fromValues(3.0, 1.0, 3.0);
 	up = vec3.fromValues(0.0, 1.0, 0.0);
 	target = vec3.fromValues(1.0, 1.0, 1.0);
-	
+
 var RenderObject = function(transform, color, shader, buffer, bufferLength)
 {
 	this.transform = transform;
@@ -30,6 +30,8 @@ var RenderObject = function(transform, color, shader, buffer, bufferLength)
 	this.buffer = buffer;
 	this.bufferLength = bufferLength;
 	this.lighting = false;
+	this.texture = false;
+	this.bumpMap = false;
 
 	this.rotationY = 0.01;
 	this.rotationX = 0.01;
@@ -60,7 +62,7 @@ window.onload = function init()
 	document.addEventListener('pointerlockchange', setupMouseLock, false);
 	document.addEventListener('mozpointerlockchange', setupMouseLock, false);
 
-	
+
 
 	// Configure viewport
 	gl.viewport(0,0,canvas.width,canvas.height);
@@ -90,6 +92,20 @@ window.onload = function init()
 
 	// Push object on the stack
 	objects.push(island);
+
+	///// CUBE OBJECT /////
+	// Create buffer and copy data into it
+	var vertexBufferCube = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferCube);
+	gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW)
+
+	// Create Object
+	var cube = new RenderObject(mat4.create(), vec4.fromValues(1,0,0,1), defaultProgram, vertexBufferCube, cubePositions.length/3);
+	mat4.translate(cube.transform, cube.transform, vec3.fromValues(-2, 1, 1));
+	mat4.scale(cube.transform, cube.transform, vec3.fromValues(2, 2, 2));
+
+	//Push object
+	objects.push(cube);
 
 	///// WATER OBJECT /////
 	// Create buffer and copy data into it
@@ -158,7 +174,7 @@ function render()
 	//Kamerakoordinaten per frame
 	viewMatrix = mat4.create();
 	mat4.lookAt(viewMatrix, eye, target, up);
-	
+
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	objects.forEach(function(object)
@@ -217,11 +233,11 @@ function render()
 
 		//Keyinputs per frame
 		moveEventHandling();
-	
+
 		//Kamerakoordinaten per frame
 		viewMatrix = mat4.create();
 		mat4.lookAt(viewMatrix, eye, target, up);
-		
+
 		// Set uniforms
 		var projectionMatrixLoc = gl.getUniformLocation(object.shader, "projectionMatrix");
 		var viewMatrixLoc = gl.getUniformLocation(object.shader, "viewMatrix");
@@ -260,7 +276,7 @@ function moveForward()
 {
 	if (keys[87])
 	{
-		
+
 		const backupEye = eye[1];
 		const backupTarget = target[1];
 		var distance = vec3.create();
