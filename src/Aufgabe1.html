@@ -114,10 +114,21 @@
 		</script>
 	</head>
 	<body>
-
+		<div style="text-align: center;">
+		<span style="display:inline-block;padding:5px;border:5px solid;border-radius: 6px;font-size:140%;font-weight:bold;background: white;">
+		3D-Objects with webGL
+		</span>
+		</div>
 		<canvas id="gl-canvas" width="640" height="360">
 			If you see this, your browser doesn't support WebGL.
 		</canvas>
+		<div style="text-align: center;">
+		<span style="display:inline-block;padding:5px;border:5px solid ;border-radius: 6px;font-size:140%;font-weight:bold;background: white;">
+		Controls:<br>
+		WASD: Movement - Mouse: Lookaround
+		</span>
+		</div>
+		<button type="button" onclick="goFullScreen();" >Fullscreen!</button><br>
 
 	</body>
 </html>
