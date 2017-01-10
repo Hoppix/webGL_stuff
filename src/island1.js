@@ -16,6 +16,11 @@ var moveSpeed = 0.01;
 
 var objects = [];
 
+//texture variables
+var cubeTexture;
+var cubeImage;
+
+
 
 	//setup viewMatrix (camera)
 	eye = vec3.fromValues(3.0, 1.0, 3.0);
@@ -71,6 +76,7 @@ window.onload = function init()
 	// Init shader programs
 	var defaultProgram = initShaders(gl, "vertex-shader", "fragment-shader");
 	var vertexLightingProgram = initShaders(gl, "vertex-shader-lighting", "fragment-shader-lighting");
+	var textureMappingProgram = initShaders(gl, "vertex-shader-texture", "fragment-shader-texture");
 
 	///// ISLAND OBJECT /////
 	// Create buffer and copy data into it
@@ -94,15 +100,40 @@ window.onload = function init()
 	objects.push(island);
 
 	///// CUBE OBJECT /////
+	// Init texture
+	cubeTexture = gl.createTexture();
+	cubeImage = new Image();
+	cubeImage.onload = function()
+	{
+		handleTexture(cubeTexture, cubeImage);
+	}
+	cubeImage.src = "sand_normal.png";
+	
+	// Load texture 
+	var texBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, cubeTexArray, gl.STATIC_DRAW);
+	
+	var vTexCoords = gl.getAttribLocation(textureMappingProgram, "vTexCoords");
+	gl.vertexAttribPointer(vTexCoords, 2, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(vTexCoords);
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
+	var mapLoc = gl.getUniformLocation(textureMappingProgram, "map");
+	gl.uniform1i(mapLoc, 0);
+
+	
 	// Create buffer and copy data into it
 	var vertexBufferCube = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferCube);
 	gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW)
 
 	// Create Object
-	var cube = new RenderObject(mat4.create(), vec4.fromValues(1,0,0,1), defaultProgram, vertexBufferCube, cubePositions.length/3);
+	var cube = new RenderObject(mat4.create(), vec4.fromValues(1,1,1,1), textureMappingProgram, vertexBufferCube, cubePositions.length/3);
 	mat4.translate(cube.transform, cube.transform, vec3.fromValues(-2, 1, 1));
 	mat4.scale(cube.transform, cube.transform, vec3.fromValues(2, 2, 2));
+	cube.texture = true;
 
 	//Push object
 	objects.push(cube);
@@ -230,7 +261,7 @@ function render()
 		}
 
 		// Set textures TODO
-
+		
 		//Keyinputs per frame
 		moveEventHandling();
 
@@ -398,4 +429,11 @@ function goFullScreen()
         canvas.webkitRequestFullScreen();
     else if(canvasFull.mozRequestFullScreen)
         canvasFull.mozRequestFullScreen();
+}
+
+function handleTexture(texture, image)
+{
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+	gl.generateMipmap(gl.TEXTURE_2D);
 }
