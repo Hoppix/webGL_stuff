@@ -83,13 +83,13 @@ window.onload = function init()
 
 	///// ISLAND OBJECT /////
 	// Init texture
-	islandTexture = gl.createTexture();
-	islandImage = new Image();
-	cubeImage.onload = function()
-	{
-		handleTexture(islandTexture, islandImage);
-	}
-	cubeImage.src = "sand_diffuse.png";
+	//islandTexture = gl.createTexture();
+	//islandImage = new Image();
+	//cubeImage.onload = function()
+	//{
+	//	handleTexture(islandTexture, islandImage);
+	//}
+	//cubeImage.src = "sand_diffuse.png";
 
 	// Load texture
 	var islandTexBuffer = gl.createBuffer();
@@ -119,7 +119,7 @@ window.onload = function init()
 	island.normalBuffer = normalBufferIsland;
 	island.normalBufferLength = islandNormals.length/3;
 	island.lighting = true;
-	island.texture = true;
+	island.texture = true
 	mat4.translate(island.transform, island.transform, vec3.fromValues(0, 0, 0));
 	mat4.scale(island.transform, island.transform, vec3.fromValues(10, 1, 10));
 
