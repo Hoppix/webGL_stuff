@@ -19,6 +19,8 @@ var objects = [];
 //texture variables
 var cubeTexture;
 var cubeImage;
+var islandTexture;
+var islandImage;
 
 
 
@@ -77,8 +79,32 @@ window.onload = function init()
 	var defaultProgram = initShaders(gl, "vertex-shader", "fragment-shader");
 	var vertexLightingProgram = initShaders(gl, "vertex-shader-lighting", "fragment-shader-lighting");
 	var textureMappingProgram = initShaders(gl, "vertex-shader-texture", "fragment-shader-texture");
+	var textureLightingProgram = initShaders(gl, "vertex-shader-texture-lighting", "fragment-shader-texture-lighting");
 
 	///// ISLAND OBJECT /////
+	// Init texture
+	islandTexture = gl.createTexture();
+	islandImage = new Image();
+	cubeImage.onload = function()
+	{
+		handleTexture(islandTexture, islandImage);
+	}
+	cubeImage.src = "sand_diffuse.png";
+
+	// Load texture
+	var islandTexBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, islandTexBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, cubeTexArray, gl.STATIC_DRAW);
+
+	var iTexCoords = gl.getAttribLocation(textureLightingProgram, "iTexCoords");
+	gl.vertexAttribPointer(iTexCoords, 2, gl.FLOAT, false, 0, 0);
+	gl.enableVertexAttribArray(iTexCoords);
+
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, islandTexture);
+	var mapLoc = gl.getUniformLocation(textureLightingProgram, "map");
+	gl.uniform1i(mapLoc, 0);
+
 	// Create buffer and copy data into it
 	var vertexBufferIsland = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferIsland);
@@ -89,10 +115,11 @@ window.onload = function init()
 	gl.bufferData(gl.ARRAY_BUFFER, islandNormals, gl.STATIC_DRAW);
 
 	// Create object
-	var island = new RenderObject(mat4.create(), vec4.fromValues(1,1,0,1), vertexLightingProgram, vertexBufferIsland, islandVertices.length/3);
+	var island = new RenderObject(mat4.create(), vec4.fromValues(1,1,0,1), textureLightingProgram, vertexBufferIsland, islandVertices.length/3);
 	island.normalBuffer = normalBufferIsland;
 	island.normalBufferLength = islandNormals.length/3;
 	island.lighting = true;
+	island.texture = true;
 	mat4.translate(island.transform, island.transform, vec3.fromValues(0, 0, 0));
 	mat4.scale(island.transform, island.transform, vec3.fromValues(10, 1, 10));
 
@@ -108,22 +135,22 @@ window.onload = function init()
 		handleTexture(cubeTexture, cubeImage);
 	}
 	cubeImage.src = "sand_normal.png";
-	
-	// Load texture 
+
+	// Load texture
 	var texBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, cubeTexArray, gl.STATIC_DRAW);
-	
+
 	var vTexCoords = gl.getAttribLocation(textureMappingProgram, "vTexCoords");
 	gl.vertexAttribPointer(vTexCoords, 2, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vTexCoords);
-	
+
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
 	var mapLoc = gl.getUniformLocation(textureMappingProgram, "map");
 	gl.uniform1i(mapLoc, 0);
 
-	
+
 	// Create buffer and copy data into it
 	var vertexBufferCube = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferCube);
@@ -261,7 +288,7 @@ function render()
 		}
 
 		// Set textures TODO
-		
+
 		//Keyinputs per frame
 		moveEventHandling();
 
