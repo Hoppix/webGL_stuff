@@ -83,13 +83,13 @@ window.onload = function init()
 
 	///// ISLAND OBJECT /////
 	// Init texture
-	//islandTexture = gl.createTexture();
-	//islandImage = new Image();
-	//cubeImage.onload = function()
-	//{
-	//	handleTexture(islandTexture, islandImage);
-	//}
-	//cubeImage.src = "sand_diffuse.png";
+	islandTexture = gl.createTexture();
+	islandImage = new Image();
+	islandImage.onload = function()
+	{
+		handleTexture(islandTexture, islandImage);
+	}
+	islandImage.src = "sand_diffuse.png";
 
 	// Load texture
 	var islandTexBuffer = gl.createBuffer();
@@ -115,7 +115,7 @@ window.onload = function init()
 	gl.bufferData(gl.ARRAY_BUFFER, islandNormals, gl.STATIC_DRAW);
 
 	// Create object
-	var island = new RenderObject(mat4.create(), vec4.fromValues(1,1,0,1), textureLightingProgram, vertexBufferIsland, islandVertices.length/3);
+	var island = new RenderObject(mat4.create(), vec4.fromValues(1,1,0,0.5), textureLightingProgram, vertexBufferIsland, islandVertices.length/3);
 	island.normalBuffer = normalBufferIsland;
 	island.normalBufferLength = islandNormals.length/3;
 	island.lighting = true;
@@ -127,40 +127,15 @@ window.onload = function init()
 	objects.push(island);
 
 	///// CUBE OBJECT /////
-	// Init texture
-	cubeTexture = gl.createTexture();
-	cubeImage = new Image();
-	cubeImage.onload = function()
-	{
-		handleTexture(cubeTexture, cubeImage);
-	}
-	cubeImage.src = "sand_normal.png";
-
-	// Load texture
-	var texBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, cubeTexArray, gl.STATIC_DRAW);
-
-	var vTexCoords = gl.getAttribLocation(textureMappingProgram, "vTexCoords");
-	gl.vertexAttribPointer(vTexCoords, 2, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(vTexCoords);
-
-	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, cubeTexture);
-	var mapLoc = gl.getUniformLocation(textureMappingProgram, "map");
-	gl.uniform1i(mapLoc, 0);
-
-
 	// Create buffer and copy data into it
 	var vertexBufferCube = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferCube);
 	gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW)
 
 	// Create Object
-	var cube = new RenderObject(mat4.create(), vec4.fromValues(1,1,1,1), textureMappingProgram, vertexBufferCube, cubePositions.length/3);
+	var cube = new RenderObject(mat4.create(), vec4.fromValues(0.3,0.3,0.3,1), defaultProgram, vertexBufferCube, cubePositions.length/3);
 	mat4.translate(cube.transform, cube.transform, vec3.fromValues(-2, 1, 1));
 	mat4.scale(cube.transform, cube.transform, vec3.fromValues(2, 2, 2));
-	cube.texture = true;
 
 	//Push object
 	objects.push(cube);
