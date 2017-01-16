@@ -282,13 +282,13 @@ var palmLeafVertices = new Float32Array([0, 0, -0.2,
                  								]);
 
 					var cubeTexArray = new Float32Array([
-            0,  0,
-            1,  0,
-            0,  1,
+                   0,  0,
+                   1,  0,
+                   0,  1,
 
-            1,  1,
-            1,  0,
-            0,  1,
+                   1,  1,
+                   1,  0,
+                   0,  1,
 
 									 // Right
                    0,  0,
