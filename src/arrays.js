@@ -113,6 +113,10 @@ var waterVertices = new Float32Array([1, 0, 1,
                     -1, 0, 1,
                     1, 0, 1
                    ]);
+	
+var tesselation = [];
+fillTess();	
+var waterVerticesTessel = new Float32Array(tesselation);
 
 
 var palmTreeVertices = new Float32Array([
@@ -335,3 +339,28 @@ var palmLeafVertices = new Float32Array([0, 0, -0.2,
                    1,  0,
                    0,  1,
 								]);
+								
+
+//der berüchtigte Sander-Algorithmus								
+function fillTess()
+{
+	for(i = 0; i < 200; i++)
+	{
+		for(t = 0; t < 200; t++)
+		{
+			tesselation.push(scaleTess(i), 0, scaleTess(t));
+			tesselation.push(scaleTess(i+1), 0, scaleTess(t));
+			tesselation.push(scaleTess(i), 0, scaleTess(t+1));
+			
+			tesselation.push(scaleTess(i+1), 0, scaleTess(t));
+			tesselation.push(scaleTess(i), 0, scaleTess(t+1));
+			tesselation.push(scaleTess(i+1), 0, scaleTess(t+1));
+		}
+	}
+}
+
+function scaleTess(value)
+{
+	return value/200 - 0.5;
+}
+		

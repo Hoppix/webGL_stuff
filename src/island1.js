@@ -22,6 +22,12 @@ var cubeImage;
 var islandTexture;
 var islandImage;
 
+//time variables
+var date;
+var time;
+var startTime;
+
+
 
 
 	//setup viewMatrix (camera)
@@ -39,6 +45,7 @@ var RenderObject = function(transform, color, shader, buffer, bufferLength)
 	this.lighting = false;
 	this.texture = false;
 	this.bumpMap = false;
+	this.displacement = false;
 
 	this.rotationY = 0.01;
 	this.rotationX = 0.01;
@@ -68,7 +75,10 @@ window.onload = function init()
 	pointerLockHandling();
 	document.addEventListener('pointerlockchange', setupMouseLock, false);
 	document.addEventListener('mozpointerlockchange', setupMouseLock, false);
-
+	
+	date = new Date();
+	startTime = date.getTime();
+	startTime = startTime
 
 
 	// Configure viewport
@@ -80,6 +90,7 @@ window.onload = function init()
 	var vertexLightingProgram = initShaders(gl, "vertex-shader-lighting", "fragment-shader-lighting");
 	var textureMappingProgram = initShaders(gl, "vertex-shader-texture", "fragment-shader-texture");
 	var textureLightingProgram = initShaders(gl, "vertex-shader-texture-lighting", "fragment-shader-texture-lighting");
+	var waveProgram = initShaders(gl, "vertex-shader-wave", "fragment-shader-wave");
 
 	///// ISLAND OBJECT /////
 	// Init texture
@@ -144,12 +155,13 @@ window.onload = function init()
 	// Create buffer and copy data into it
 	var vertexBufferWater = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBufferWater);
-	gl.bufferData(gl.ARRAY_BUFFER, waterVertices, gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, waterVerticesTessel, gl.STATIC_DRAW);
 
 	// Create object
-	var water = new RenderObject(mat4.create(), vec4.fromValues(0,0,1,1), defaultProgram, vertexBufferWater, waterVertices.length/3);
+	var water = new RenderObject(mat4.create(), vec4.fromValues(0,0,1,1), waveProgram, vertexBufferWater, waterVerticesTessel.length/3);
 	mat4.translate(water.transform, water.transform, vec3.fromValues(0, 0, 0));
 	mat4.scale(water.transform, water.transform, vec3.fromValues(100, 1, 100));
+	water.displacement = true;
 
 	// Push object on the stack
 	objects.push(water);
@@ -260,6 +272,19 @@ function render()
 		{
 			var colorLoc = gl.getUniformLocation(object.shader, "objectColor");
 			gl.uniform4fv(colorLoc, object.color);
+		}
+		
+		if(object.displacement)
+		{
+			date = new Date();
+			time = date.getTime();
+			time = time
+			time = (time - startTime);
+			time = time / 1000
+			time = time % (Math.PI*2)
+			var timeLocation = gl.getUniformLocation(object.shader, "time");
+			gl.uniform1f(timeLocation, time);
+			
 		}
 
 		// Set textures TODO

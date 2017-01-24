@@ -213,7 +213,33 @@
 				gl_FragColor = color*texture2D(map, fTexCoords);
 			}
 		</script>
+		<script id="vertex-shader-wave" type="x-shader/x-vertex">
+			attribute vec4 vPosition;
 
+			uniform mat4 modelMatrix;
+			uniform mat4 projectionMatrix;
+			uniform mat4 viewMatrix;
+			uniform float time;
+			varying vec4 wavePosition;
+
+			void main()
+			{
+				wavePosition = vPosition;
+				wavePosition[1] = 0.1 * sin(wavePosition[0]*200.0 + time) + 0.3;
+				gl_Position = projectionMatrix * viewMatrix * modelMatrix * wavePosition;
+			}
+		</script>
+		<script id="fragment-shader-wave" type="x-shader/x-fragment">
+			precision mediump float;
+
+			uniform vec4 objectColor;
+
+			void main()
+			{
+				gl_FragColor = objectColor;
+			}
+		</script>
+		
 		<script type="text/javascript" src="../Common/webgl-utils.js">
 		</script>
 		<script type="text/javascript" src="../Common/initShaders.js">
